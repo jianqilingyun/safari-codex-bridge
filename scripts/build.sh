@@ -2,7 +2,7 @@
 # Build only. Installing or launching the output is a separate user action.
 set -euo pipefail
 BRIDGE_SOURCE="$(cd "$(dirname "$0")/.." && pwd)"
-BRIDGE_WORK="${BRIDGE_WORK:-$BRIDGE_SOURCE/build}"
+BRIDGE_WORK="${BRIDGE_WORK:-$BRIDGE_SOURCE/build.noindex}"
 BRIDGE_BUNDLE_PREFIX="${BRIDGE_BUNDLE_PREFIX:-local.codex.safari.context}"
 BRIDGE_TEAM_ID="${BRIDGE_TEAM_ID:-}"
 BRIDGE_SIGN_IDENTITY="${BRIDGE_SIGN_IDENTITY:-}"
@@ -42,6 +42,12 @@ BRIDGE_APP="$BRIDGE_WORK/DerivedData/Build/Products/Release/Safari-Codex-Bridge.
 BRIDGE_HELPER="$BRIDGE_APP/Contents/Library/LoginItems/SafariChatHelper.app"
 mkdir -p "$BRIDGE_HELPER/Contents/MacOS" "$BRIDGE_HELPER/Contents/Resources" "$BRIDGE_WORK/SwiftCache"
 cp "$BRIDGE_SOURCE/chat-runtime/Info.plist" "$BRIDGE_HELPER/Contents/Info.plist"
+# The helper exits when its version differs from the host. Keep packaged values
+# synchronized with the built host rather than relying on manual plist edits.
+for BRIDGE_VERSION_KEY in CFBundleShortVersionString CFBundleVersion; do
+  BRIDGE_VERSION_VALUE=$(/usr/libexec/PlistBuddy -c "Print :$BRIDGE_VERSION_KEY" "$BRIDGE_APP/Contents/Info.plist")
+  /usr/libexec/PlistBuddy -c "Set :$BRIDGE_VERSION_KEY $BRIDGE_VERSION_VALUE" "$BRIDGE_HELPER/Contents/Info.plist"
+done
 /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier $BRIDGE_BUNDLE_PREFIX.ChatHelper" "$BRIDGE_HELPER/Contents/Info.plist"
 /usr/libexec/PlistBuddy -c "Add :BridgeAppGroup string $BRIDGE_APP_GROUP" "$BRIDGE_HELPER/Contents/Info.plist"
 cp "$BRIDGE_SOURCE/chat-runtime/worker.py" "$BRIDGE_HELPER/Contents/Resources/worker.py"

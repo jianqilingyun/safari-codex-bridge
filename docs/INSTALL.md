@@ -34,7 +34,7 @@ Options:
 
 | Variable | Meaning |
 | --- | --- |
-| `BRIDGE_WORK` | Build directory, default `build/` |
+| `BRIDGE_WORK` | Build directory, default `build.noindex/` |
 | `BRIDGE_ARCHS` | `arm64 x86_64` by default; choose one for a faster local build |
 | `BRIDGE_BUNDLE_PREFIX` | Default `local.codex.safari.context`; use a distinct reverse-domain prefix for a fork |
 | `BRIDGE_TEAM_ID` | Your 10-character Apple Team ID |
@@ -46,7 +46,7 @@ Options:
 
 ## 4. Enable the extension
 
-Copy `build/DerivedData/Build/Products/Release/Safari-Codex-Bridge.app` to Applications and open it. In Safari Settings → Extensions, enable Safari Codex Bridge and grant the sites you intend to use. You can grant all websites; a specific site’s Deny still overrides that general setting. Click the Safari toolbar button to open the sidebar.
+Copy `build.noindex/DerivedData/Build/Products/Release/Safari-Codex-Bridge.app` to Applications and open it. In Safari Settings → Extensions, enable Safari Codex Bridge and grant the sites you intend to use. You can grant all websites; a specific site’s Deny still overrides that general setting. Click the Safari toolbar button to open the sidebar.
 
 The companion window offers a persistent Simplified Chinese / English language picker. It defaults to the system language and also changes the optional menu-bar menu. Sidebar language remains a separate preference.
 
@@ -81,3 +81,5 @@ Restart/reconnect Codex’s MCP tools if needed. Ask for the current Safari page
 ## Distribution
 
 A development signature is for local use, not a completed public release process. For normal distribution outside the Mac App Store, follow [Apple’s Developer ID signing and notarization requirements](https://developer.apple.com/documentation/safariservices/distributing-your-safari-web-extension). Never upload your certificate/private key, login state, or exported pairing file with the app.
+
+The companion app hides its Dock icon by default. Reopen it from Applications to change settings; enable **Show in Dock** to keep the icon visible. Closing its window keeps the connection running. Build outputs use `build.noindex/` so Spotlight does not list development copies.

@@ -8,6 +8,7 @@ A Safari sidebar for asking questions about the page you are reading — text, s
 
 ## Features
 
+- Hide the companion app’s Dock and menu-bar icons by default; independently enable either in the connection window. Reopen the app from Applications to change settings.
 - Switch the companion window between Simplified Chinese and English; the choice persists and also changes its menu-bar menu. Sidebar language remains independently selectable.
 
 - Chat alongside the current webpage, with streaming answers and follow-up questions.

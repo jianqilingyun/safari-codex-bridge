@@ -49,6 +49,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var lastHeartbeat: TimeInterval = 0
     private var lastHelperCheck: TimeInterval = 0
     private var statusItem: NSStatusItem?
+    var showsDockIcon: Bool {
+        UserDefaults.standard.bool(forKey: "showsDockIcon")
+    }
+    func setShowsDockIcon(_ visible: Bool) {
+        UserDefaults.standard.set(visible, forKey: "showsDockIcon")
+        NSApp.setActivationPolicy(visible ? .regular : .accessory)
+    }
     var showsMenuBarItem: Bool {
         UserDefaults.standard.bool(forKey: "showsMenuBarItem")
     }
@@ -76,6 +83,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var localServer: LocalBridgeServer?
     var connectionSettings: [String: Any]?
     func applicationDidFinishLaunching(_ notification: Notification) {
+        NSApp.setActivationPolicy(showsDockIcon ? .regular : .accessory)
         do {
             root = try bridgeDirectory()
             let saved = root!.appendingPathComponent("connection.json")

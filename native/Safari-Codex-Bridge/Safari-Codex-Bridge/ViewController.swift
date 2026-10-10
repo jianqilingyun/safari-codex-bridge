@@ -10,11 +10,12 @@ class ViewController: NSViewController {
     private lazy var settings = NSButton(title: "", target: self, action: #selector(openSettings))
     private lazy var save = NSButton(title: "", target: self, action: #selector(exportConnection))
     private lazy var menuBarToggle = NSButton(checkboxWithTitle: "", target: self, action: #selector(toggleMenuBarItem))
+    private lazy var dockToggle = NSButton(checkboxWithTitle: "", target: self, action: #selector(toggleDockIcon))
     private enum Status { case connection, notReady, saved, failed(String) }
     private var currentStatus: Status = .connection
     override func viewDidLoad() {
         super.viewDidLoad()
-        preferredContentSize = NSSize(width: 620, height: 510)
+        preferredContentSize = NSSize(width: 620, height: 550)
         let title = NSTextField(labelWithString: "Safari ↔ Codex")
         title.font = NSFont.boldSystemFont(ofSize: 28)
         intro.font = NSFont.systemFont(ofSize: 16)
@@ -25,7 +26,7 @@ class ViewController: NSViewController {
         let languageRow = NSStackView(views: [languageLabel, languagePicker])
         languageRow.orientation = .horizontal
         languageRow.spacing = 12
-        let stack = NSStackView(views: [title, languageRow, intro, status, settings, save, menuBarToggle, note])
+        let stack = NSStackView(views: [title, languageRow, intro, status, settings, save, menuBarToggle, dockToggle, note])
         stack.orientation = .vertical; stack.alignment = .leading; stack.spacing = 20
         stack.translatesAutoresizingMaskIntoConstraints = false; view.addSubview(stack)
         NSLayoutConstraint.activate([stack.leadingAnchor.constraint(equalTo:view.leadingAnchor,constant:32),stack.trailingAnchor.constraint(equalTo:view.trailingAnchor,constant:-32),stack.topAnchor.constraint(equalTo:view.topAnchor,constant:30), stack.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor, constant: -24)])
@@ -47,8 +48,10 @@ class ViewController: NSViewController {
         settings.title = HostLanguage.text("打开 Safari 扩展设置", "Open Safari Extension Settings")
         save.title = HostLanguage.text("保存 Codex 本地连接配置", "Save Codex Connection Configuration")
         menuBarToggle.title = HostLanguage.text("在菜单栏显示", "Show in Menu Bar")
+        dockToggle.title = HostLanguage.text("在 Dock 显示", "Show in Dock")
         note.stringValue = HostLanguage.text("点击 Safari 工具栏中的扩展按钮打开侧栏。关闭此窗口后连接继续运行。重新打开应用可调整设置。侧栏语言可在侧栏设置中单独选择。", "Click the extension button in the Safari toolbar to open the sidebar. The connection stays active when you close this window. Reopen the app to change settings. Choose the sidebar language separately in its settings.")
         menuBarToggle.state = (NSApp.delegate as? AppDelegate)?.showsMenuBarItem == true ? .on : .off
+        dockToggle.state = (NSApp.delegate as? AppDelegate)?.showsDockIcon == true ? .on : .off
         switch currentStatus {
         case .connection:
             if let error = (NSApp.delegate as? AppDelegate)?.setupError {
@@ -63,6 +66,9 @@ class ViewController: NSViewController {
     }
     @objc private func toggleMenuBarItem() {
         (NSApp.delegate as? AppDelegate)?.setShowsMenuBarItem(menuBarToggle.state == .on)
+    }
+    @objc private func toggleDockIcon() {
+        (NSApp.delegate as? AppDelegate)?.setShowsDockIcon(dockToggle.state == .on)
     }
     @objc private func openSettings() { SFSafariApplication.showPreferencesForExtension(withIdentifier: extensionBundleIdentifier) { _ in } }
     @objc private func exportConnection() {
