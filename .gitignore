@@ -12,6 +12,7 @@ Safari-Codex-connection.json
 *.provisionprofile
 node_modules/
 build/
+build.noindex/
 dist/
 .DS_Store
 __pycache__/

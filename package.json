@@ -1,7 +1,7 @@
 {
   "name": "safari-codex-bridge",
   "private": true,
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "A local Safari sidebar client for the official Codex app-server",
   "license": "MIT",
   "scripts": {

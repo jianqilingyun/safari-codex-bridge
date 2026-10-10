@@ -65,3 +65,5 @@ npm test
 自动测试使用合成网页和模拟传输；不能替代真实 Safari 授权、模型或麦克风验收。Apple Silicon 与 Intel 均做编译检查，真实浏览器验收目前限于 Apple Silicon。
 
 项目原创代码采用 [MIT](LICENSE)；Readability 保留 [Apache-2.0](THIRD_PARTY_NOTICES.md) 许可。
+
+配套程序默认隐藏 Dock 图标，可在连接窗口勾选“在 Dock 显示”。关闭窗口后后台连接继续运行；需要设置时，从“应用程序”重新打开。构建产物默认存放于 `build.noindex/`，避免开发版本出现在系统搜索中。
