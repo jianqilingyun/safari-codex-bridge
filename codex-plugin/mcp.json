@@ -1,0 +1,13 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "safari-context": {
+      "type": "stdio",
+      "command": "/usr/bin/python3",
+      "cwd": ".",
+      "args": [
+        "server/server.py"
+      ]
+    }
+  }
+}

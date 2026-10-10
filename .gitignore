@@ -1,0 +1,28 @@
+# Local data, credentials, signing and generated artifacts
+.local/
+*.local.*
+connection.json
+Safari-Codex-connection.json
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.mobileprovision
+*.provisionprofile
+node_modules/
+build/
+dist/
+.DS_Store
+__pycache__/
+*.py[cod]
+xcuserdata/
+*.xcuserstate
+# Test outputs contain local information and must not enter Git history.
+tests/*.json
+tests/*.png
+tests/*.jpg
+tests/live/
+*.zip
+*.app/
+*.appex/

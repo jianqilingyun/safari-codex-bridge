@@ -1,0 +1,50 @@
+{
+  "manifest_version": 2,
+  "name": "Safari Codex Bridge",
+  "version": "0.4.8",
+  "description": "在 Safari 右侧连续询问当前网页，支持正文、图片、图表与 Codex 订阅模型。",
+  "permissions": [
+    "nativeMessaging",
+    "tabs",
+    "activeTab",
+    "storage",
+    "contextMenus",
+    "http://*/*",
+    "https://*/*"
+  ],
+  "background": {
+    "page": "background.html",
+    "persistent": true
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "vendor/Readability.js",
+        "collector.js",
+        "sidebar.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "browser_action": {
+    "default_title": "Codex 网页问答"
+  },
+  "commands": {
+    "toggle-sidebar": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Period",
+        "mac": "Command+Shift+Period"
+      },
+      "description": "打开或关闭 Codex 网页问答"
+    }
+  },
+  "icons": {
+    "48": "icon.svg",
+    "128": "icon.svg"
+  }
+}

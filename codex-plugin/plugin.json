@@ -1,0 +1,23 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "safari-codex-bridge",
+  "version": "0.4.8",
+  "description": "Read Safari webpages, selections, images and visible-page screenshots in existing Codex chats through a local companion.",
+  "license": "MIT",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Safari 网页分析",
+        "shortDescription": "在 Codex 中读取 Safari 网页、图片与图表",
+        "category": "Productivity",
+        "capabilities": [
+          "Read"
+        ],
+        "defaultPrompt": [
+          "分析 Safari 当前网页",
+          "看看当前 Safari 网页中的图片和图表"
+        ]
+      }
+    }
+  }
+}

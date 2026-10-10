@@ -1,0 +1,15 @@
+{
+  "name": "safari-codex-bridge",
+  "private": true,
+  "version": "0.4.8",
+  "description": "A local Safari sidebar client for the official Codex app-server",
+  "license": "MIT",
+  "scripts": {
+    "test": "node tests/test-history.mjs && node tests/test-pin-dictation.mjs && node tests/test-tab-context.mjs && node tests/test-collector.mjs && node tests/test-sidebar.mjs && node tests/test-appearance.mjs",
+    "test:python": "python3 tests/test_mcp.py && python3 tests/test-runtime.py && python3 tests/test-selection-inputs.py && python3 tests/test-audit.py",
+    "test:webkit": "BRIDGE_TEST_WEBKIT=1 node tests/test-collector.mjs && BRIDGE_TEST_WEBKIT=1 node tests/test-sidebar.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

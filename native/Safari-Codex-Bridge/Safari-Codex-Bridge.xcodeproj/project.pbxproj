@@ -1,0 +1,597 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 110;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6A60B40D3078E8E800B99DB0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A60B40C3078E8E800B99DB0 /* AppDelegate.swift */; };
+		6A60B4193078E8E800B99DB0 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A60B4183078E8E800B99DB0 /* ViewController.swift */; };
+		6A60B41C3078E8E800B99DB0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6A60B41A3078E8E800B99DB0 /* Main.storyboard */; };
+		6A60B41E3078E8E800B99DB0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A60B41D3078E8E800B99DB0 /* Assets.xcassets */; };
+		6A60B4253078E8E800B99DB0 /* Safari-Codex-Bridge Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 6A60B4243078E8E800B99DB0 /* Safari-Codex-Bridge Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		6A60B42A3078E8E800B99DB0 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A60B4293078E8E800B99DB0 /* SafariWebExtensionHandler.swift */; };
+		6A60B43C3078E8E800B99DB0 /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 6A60B4363078E8E800B99DB0 /* background.js */; };
+		6A60B43D3078E8E800B99DB0 /* collector.js in Resources */ = {isa = PBXBuildFile; fileRef = 6A60B4373078E8E800B99DB0 /* collector.js */; };
+		6A60B43E3078E8E800B99DB0 /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 6A60B4383078E8E800B99DB0 /* popup.html */; };
+		6A60B43F3078E8E800B99DB0 /* icon.svg in Resources */ = {isa = PBXBuildFile; fileRef = 6A60B4393078E8E800B99DB0 /* icon.svg */; };
+		6A60B4403078E8E800B99DB0 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 6A60B43A3078E8E800B99DB0 /* manifest.json */; };
+		6A60B4413078E8E800B99DB0 /* vendor in Resources */ = {isa = PBXBuildFile; fileRef = 6A60B43B3078E8E800B99DB0 /* vendor */; };
+		BD0000000000000000000000 /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = BC0000000000000000000000 /* popup.css */; };
+		BD0000000000000000000001 /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = BC0000000000000000000001 /* popup.js */; };
+		BF0000000000000000000000 /* sidebar.js in Resources */ = {isa = PBXBuildFile; fileRef = BE0000000000000000000000 /* sidebar.js */; };
+		BF0000000000000000000001 /* background.html in Resources */ = {isa = PBXBuildFile; fileRef = BE0000000000000000000001 /* background.html */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		6A60B4263078E8E800B99DB0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6A60B4013078E8E700B99DB0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6A60B4233078E8E800B99DB0;
+			remoteInfo = "Safari-Codex-Bridge Extension";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		6A60B4313078E8E800B99DB0 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			dstPath = "";
+			dstSubfolder = PlugIns;
+			files = (
+				6A60B4253078E8E800B99DB0 /* Safari-Codex-Bridge Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		6A60B4093078E8E700B99DB0 /* Safari-Codex-Bridge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Safari-Codex-Bridge.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6A60B40C3078E8E800B99DB0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		6A60B4183078E8E800B99DB0 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		6A60B41B3078E8E800B99DB0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		6A60B41D3078E8E800B99DB0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		6A60B41F3078E8E800B99DB0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6A60B4243078E8E800B99DB0 /* Safari-Codex-Bridge Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Safari-Codex-Bridge Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6A60B4293078E8E800B99DB0 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		6A60B42B3078E8E800B99DB0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6A60B4363078E8E800B99DB0 /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = background.js; path = ../../../extension/background.js; sourceTree = "<group>"; };
+		6A60B4373078E8E800B99DB0 /* collector.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = collector.js; path = ../../../extension/collector.js; sourceTree = "<group>"; };
+		6A60B4383078E8E800B99DB0 /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = popup.html; path = ../../../extension/popup.html; sourceTree = "<group>"; };
+		6A60B4393078E8E800B99DB0 /* icon.svg */ = {isa = PBXFileReference; lastKnownFileType = text; name = icon.svg; path = ../../../extension/icon.svg; sourceTree = "<group>"; };
+		6A60B43A3078E8E800B99DB0 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = ../../../extension/manifest.json; sourceTree = "<group>"; };
+		6A60B43B3078E8E800B99DB0 /* vendor */ = {isa = PBXFileReference; lastKnownFileType = folder; name = vendor; path = ../../../extension/vendor; sourceTree = "<group>"; };
+		BC0000000000000000000000 /* popup.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = popup.css; path = ../../../extension/popup.css; sourceTree = "<group>"; };
+		BC0000000000000000000001 /* popup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = popup.js; path = ../../../extension/popup.js; sourceTree = "<group>"; };
+		BE0000000000000000000000 /* sidebar.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = sidebar.js; path = ../../../extension/sidebar.js; sourceTree = "<group>"; };
+		BE0000000000000000000001 /* background.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = background.html; path = ../../../extension/background.html; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6A60B4063078E8E700B99DB0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+		6A60B4213078E8E800B99DB0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6A60B4003078E8E700B99DB0 = {
+			isa = PBXGroup;
+			children = (
+				6A60B40B3078E8E700B99DB0 /* Safari-Codex-Bridge */,
+				6A60B4283078E8E800B99DB0 /* Safari-Codex-Bridge Extension */,
+				6A60B40A3078E8E700B99DB0 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6A60B40A3078E8E700B99DB0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6A60B4093078E8E700B99DB0 /* Safari-Codex-Bridge.app */,
+				6A60B4243078E8E800B99DB0 /* Safari-Codex-Bridge Extension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6A60B40B3078E8E700B99DB0 /* Safari-Codex-Bridge */ = {
+			isa = PBXGroup;
+			children = (
+				6A60B40C3078E8E800B99DB0 /* AppDelegate.swift */,
+				6A60B4183078E8E800B99DB0 /* ViewController.swift */,
+				6A60B41A3078E8E800B99DB0 /* Main.storyboard */,
+				6A60B41D3078E8E800B99DB0 /* Assets.xcassets */,
+				6A60B41F3078E8E800B99DB0 /* Info.plist */,
+				6A60B40E3078E8E800B99DB0 /* Resources */,
+			);
+			path = "Safari-Codex-Bridge";
+			sourceTree = "<group>";
+		};
+		6A60B40E3078E8E800B99DB0 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		6A60B4283078E8E800B99DB0 /* Safari-Codex-Bridge Extension */ = {
+			isa = PBXGroup;
+			children = (
+				6A60B4353078E8E800B99DB0 /* Resources */,
+				6A60B4293078E8E800B99DB0 /* SafariWebExtensionHandler.swift */,
+				6A60B42B3078E8E800B99DB0 /* Info.plist */,
+			);
+			path = "Safari-Codex-Bridge Extension";
+			sourceTree = "<group>";
+		};
+		6A60B4353078E8E800B99DB0 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				6A60B4363078E8E800B99DB0 /* background.js */,
+				BE0000000000000000000001 /* background.html */,
+				BE0000000000000000000000 /* sidebar.js */,
+				6A60B4373078E8E800B99DB0 /* collector.js */,
+				6A60B4383078E8E800B99DB0 /* popup.html */,
+				BC0000000000000000000001 /* popup.js */,
+				BC0000000000000000000000 /* popup.css */,
+				6A60B4393078E8E800B99DB0 /* icon.svg */,
+				6A60B43A3078E8E800B99DB0 /* manifest.json */,
+				6A60B43B3078E8E800B99DB0 /* vendor */,
+			);
+			name = Resources;
+			path = "Safari-Codex-Bridge Extension";
+			sourceTree = SOURCE_ROOT;
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6A60B4083078E8E700B99DB0 /* Safari-Codex-Bridge */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6A60B4323078E8E800B99DB0 /* Build configuration list for PBXNativeTarget "Safari-Codex-Bridge" */;
+			buildPhases = (
+				6A60B4053078E8E700B99DB0 /* Sources */,
+				6A60B4063078E8E700B99DB0 /* Frameworks */,
+				6A60B4073078E8E700B99DB0 /* Resources */,
+				6A60B4313078E8E800B99DB0 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6A60B4273078E8E800B99DB0 /* PBXTargetDependency */,
+			);
+			name = "Safari-Codex-Bridge";
+			productName = "Safari-Codex-Bridge";
+			productReference = 6A60B4093078E8E700B99DB0 /* Safari-Codex-Bridge.app */;
+			productType = "com.apple.product-type.application";
+		};
+		6A60B4233078E8E800B99DB0 /* Safari-Codex-Bridge Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6A60B42E3078E8E800B99DB0 /* Build configuration list for PBXNativeTarget "Safari-Codex-Bridge Extension" */;
+			buildPhases = (
+				6A60B4203078E8E800B99DB0 /* Sources */,
+				6A60B4213078E8E800B99DB0 /* Frameworks */,
+				6A60B4223078E8E800B99DB0 /* Resources */,
+			);
+			buildRules = (
+			);
+			name = "Safari-Codex-Bridge Extension";
+			productName = "Safari-Codex-Bridge Extension";
+			productReference = 6A60B4243078E8E800B99DB0 /* Safari-Codex-Bridge Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6A60B4013078E8E700B99DB0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2700;
+				LastUpgradeCheck = 2700;
+				TargetAttributes = {
+					6A60B4083078E8E700B99DB0 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+					6A60B4233078E8E800B99DB0 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+				};
+			};
+			buildConfigurationList = 6A60B4043078E8E700B99DB0 /* Build configuration list for PBXProject "Safari-Codex-Bridge" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 6A60B4003078E8E700B99DB0;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 6A60B40A3078E8E700B99DB0 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6A60B4083078E8E700B99DB0 /* Safari-Codex-Bridge */,
+				6A60B4233078E8E800B99DB0 /* Safari-Codex-Bridge Extension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6A60B4073078E8E700B99DB0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+				6A60B41C3078E8E800B99DB0 /* Main.storyboard in Resources */,
+				6A60B41E3078E8E800B99DB0 /* Assets.xcassets in Resources */,
+			);
+		};
+		6A60B4223078E8E800B99DB0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+				6A60B4413078E8E800B99DB0 /* vendor in Resources */,
+				6A60B43D3078E8E800B99DB0 /* collector.js in Resources */,
+				6A60B43E3078E8E800B99DB0 /* popup.html in Resources */,
+				BD0000000000000000000001 /* popup.js in Resources */,
+				BD0000000000000000000000 /* popup.css in Resources */,
+				6A60B4403078E8E800B99DB0 /* manifest.json in Resources */,
+				6A60B43C3078E8E800B99DB0 /* background.js in Resources */,
+				BF0000000000000000000001 /* background.html in Resources */,
+				BF0000000000000000000000 /* sidebar.js in Resources */,
+				6A60B43F3078E8E800B99DB0 /* icon.svg in Resources */,
+			);
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6A60B4053078E8E700B99DB0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+				6A60B4193078E8E800B99DB0 /* ViewController.swift in Sources */,
+				6A60B40D3078E8E800B99DB0 /* AppDelegate.swift in Sources */,
+			);
+		};
+		6A60B4203078E8E800B99DB0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+				6A60B42A3078E8E800B99DB0 /* SafariWebExtensionHandler.swift in Sources */,
+			);
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		6A60B4273078E8E800B99DB0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6A60B4233078E8E800B99DB0 /* Safari-Codex-Bridge Extension */;
+			targetProxy = 6A60B4263078E8E800B99DB0 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		6A60B41A3078E8E800B99DB0 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6A60B41B3078E8E800B99DB0 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		6A60B42C3078E8E800B99DB0 /* Debug configuration for PBXProject "Safari-Codex-Bridge" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		6A60B42D3078E8E800B99DB0 /* Release configuration for PBXProject "Safari-Codex-Bridge" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		6A60B42F3078E8E800B99DB0 /* Debug configuration for PBXNativeTarget "Safari-Codex-Bridge Extension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				BRIDGE_BUNDLE_PREFIX = local.codex.safari.context;
+				BRIDGE_APP_GROUP = "$(DEVELOPMENT_TEAM).$(BRIDGE_BUNDLE_PREFIX)";
+				CURRENT_PROJECT_VERSION = 20;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Safari-Codex-Bridge Extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Safari-Codex-Bridge Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MARKETING_VERSION = 0.4.8;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BRIDGE_BUNDLE_PREFIX).Extension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		6A60B4303078E8E800B99DB0 /* Release configuration for PBXNativeTarget "Safari-Codex-Bridge Extension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				BRIDGE_BUNDLE_PREFIX = local.codex.safari.context;
+				BRIDGE_APP_GROUP = "$(DEVELOPMENT_TEAM).$(BRIDGE_BUNDLE_PREFIX)";
+				CURRENT_PROJECT_VERSION = 20;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Safari-Codex-Bridge Extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Safari-Codex-Bridge Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MARKETING_VERSION = 0.4.8;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BRIDGE_BUNDLE_PREFIX).Extension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		6A60B4333078E8E800B99DB0 /* Debug configuration for PBXNativeTarget "Safari-Codex-Bridge" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				BRIDGE_BUNDLE_PREFIX = local.codex.safari.context;
+				BRIDGE_APP_GROUP = "$(DEVELOPMENT_TEAM).$(BRIDGE_BUNDLE_PREFIX)";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 20;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Safari-Codex-Bridge/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Safari-Codex-Bridge";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				INFOPLIST_KEY_NSViewGestureRecognizerIsExclusive = NO;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.4.8;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BRIDGE_BUNDLE_PREFIX)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		6A60B4343078E8E800B99DB0 /* Release configuration for PBXNativeTarget "Safari-Codex-Bridge" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				BRIDGE_BUNDLE_PREFIX = local.codex.safari.context;
+				BRIDGE_APP_GROUP = "$(DEVELOPMENT_TEAM).$(BRIDGE_BUNDLE_PREFIX)";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 20;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Safari-Codex-Bridge/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Safari-Codex-Bridge";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				INFOPLIST_KEY_NSViewGestureRecognizerIsExclusive = NO;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.4.8;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BRIDGE_BUNDLE_PREFIX)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6A60B4043078E8E700B99DB0 /* Build configuration list for PBXProject "Safari-Codex-Bridge" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6A60B42C3078E8E800B99DB0 /* Debug configuration for PBXProject "Safari-Codex-Bridge" */,
+				6A60B42D3078E8E800B99DB0 /* Release configuration for PBXProject "Safari-Codex-Bridge" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		6A60B42E3078E8E800B99DB0 /* Build configuration list for PBXNativeTarget "Safari-Codex-Bridge Extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6A60B42F3078E8E800B99DB0 /* Debug configuration for PBXNativeTarget "Safari-Codex-Bridge Extension" */,
+				6A60B4303078E8E800B99DB0 /* Release configuration for PBXNativeTarget "Safari-Codex-Bridge Extension" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		6A60B4323078E8E800B99DB0 /* Build configuration list for PBXNativeTarget "Safari-Codex-Bridge" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6A60B4333078E8E800B99DB0 /* Debug configuration for PBXNativeTarget "Safari-Codex-Bridge" */,
+				6A60B4343078E8E800B99DB0 /* Release configuration for PBXNativeTarget "Safari-Codex-Bridge" */,
+			);
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 6A60B4013078E8E700B99DB0 /* Project object */;
+	validationLevel = 1;
+}
