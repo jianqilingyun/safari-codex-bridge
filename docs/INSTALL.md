@@ -2,7 +2,7 @@
 
 [English README](../README.md) · [中文简介](../README.zh-CN.md)
 
-The repository is a source release. It does not contain a signed/notarized installer. Build output alone is not evidence that Safari will accept your signing setup.
+Releases include source and an optional ad hoc signed test package. No Developer ID signed/notarized installer is available. See [test-package installation notes](AD-HOC-INSTALL.zh-CN.md) before installing the prebuilt package. Build output alone is not evidence that Safari will accept your signing setup.
 
 ## 1. Prepare the tools
 
@@ -40,11 +40,15 @@ Options:
 | `BRIDGE_TEAM_ID` | Your 10-character Apple Team ID |
 | `BRIDGE_SIGN_IDENTITY` | Your signing certificate name or SHA-1 |
 
+`./scripts/build.sh --ad-hoc` creates an ad hoc signed test ZIP without a certificate or notarization. Safari developer settings are required and fresh-Mac app-group behavior is not guaranteed; see [the Chinese test-package guide](AD-HOC-INSTALL.zh-CN.md). It does not install or launch the app.
+
 `./scripts/build.sh --unsigned` performs compile checks only. It intentionally does not create a signed distribution ZIP.
 
 ## 4. Enable the extension
 
 Copy `build/DerivedData/Build/Products/Release/Safari-Codex-Bridge.app` to Applications and open it. In Safari Settings → Extensions, enable Safari Codex Bridge and grant the sites you intend to use. You can grant all websites; a specific site’s Deny still overrides that general setting. Click the Safari toolbar button to open the sidebar.
+
+The companion window offers a persistent Simplified Chinese / English language picker. It defaults to the system language and also changes the optional menu-bar menu. Sidebar language remains a separate preference.
 
 Keep the companion running for chat and optional MCP access. Its window can close without stopping it. The menu-bar icon is hidden by default and can be enabled from the connection window. Pinning automatically opens the sidebar only on websites Safari already permits.
 

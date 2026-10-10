@@ -4,9 +4,11 @@ A Safari sidebar for asking questions about the page you are reading — text, s
 
 [简体中文](README.zh-CN.md) · [Build & install](docs/INSTALL.md) · [Privacy](PRIVACY.md) · [Security](SECURITY.md)
 
-**Independent community project. Not an official OpenAI, Apple or Google extension.** This first public release is source only: build and sign it on your own Mac. There is no notarized installer yet.
+**Independent community project. Not an official OpenAI, Apple or Google extension.** Source and an optional **ad hoc signed test package** are available in [Releases](https://github.com/jianqilingyun/safari-codex-bridge/releases/latest). The test package is **not notarized**, requires Safari developer settings, and has not been validated end to end on a fresh Mac. See [test-package installation notes](docs/AD-HOC-INSTALL.zh-CN.md). For regular local use, build with your own Apple signing identity.
 
 ## Features
+
+- Switch the companion window between Simplified Chinese and English; the choice persists and also changes its menu-bar menu. Sidebar language remains independently selectable.
 
 - Chat alongside the current webpage, with streaming answers and follow-up questions.
 - Attach selected text, page text, a visible screenshot, or up to three additional authorized tabs. Review or remove references before sending.

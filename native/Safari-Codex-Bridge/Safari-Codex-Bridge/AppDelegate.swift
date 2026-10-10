@@ -3,12 +3,30 @@ import SafariServices
 import Network
 import Security
 
+// The companion window has its own preference; sidebar language remains independent.
+enum HostLanguage {
+    static let changed = Notification.Name("BridgeHostLanguageChanged")
+    static var code: String {
+        let saved = UserDefaults.standard.string(forKey: "hostInterfaceLanguage")
+        if saved == "zh" || saved == "en" { return saved! }
+        return Locale.preferredLanguages.first?.hasPrefix("zh") == true ? "zh" : "en"
+    }
+    static func text(_ chinese: String, _ english: String) -> String {
+        code == "zh" ? chinese : english
+    }
+    static func select(_ code: String) {
+        guard code == "zh" || code == "en" else { return }
+        UserDefaults.standard.set(code, forKey: "hostInterfaceLanguage")
+        NotificationCenter.default.post(name: changed, object: nil)
+    }
+}
+
 let bridgeGroup = Bundle.main.object(forInfoDictionaryKey: "BridgeAppGroup") as? String ?? ""
 let extensionBundleIdentifier = Bundle.main.object(forInfoDictionaryKey: "BridgeExtensionIdentifier") as? String ?? ""
 
 func bridgeDirectory() throws -> URL {
     guard let group = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: bridgeGroup) else {
-        throw NSError(domain: "SafariCodexBridge", code: 1, userInfo: [NSLocalizedDescriptionKey: "无法打开本地共享目录"])
+        throw NSError(domain: "SafariCodexBridge", code: 1, userInfo: [NSLocalizedDescriptionKey: HostLanguage.text("无法打开本地共享目录", "Unable to open the local shared folder")])
     }
     let root = group.appendingPathComponent("context-bridge", isDirectory: true)
     for name in ["", "commands", "responses"] {
@@ -44,14 +62,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             statusItem = nil
             return
         }
-        guard statusItem == nil else { return }
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        if statusItem == nil { statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength) }
         statusItem?.button?.title = "Safari ↔ Codex"
         let menu = NSMenu()
-        menu.addItem(withTitle: "显示连接窗口", action: #selector(showWindow), keyEquivalent: "")
-        menu.addItem(withTitle: "Safari 扩展设置", action: #selector(openPreferences), keyEquivalent: "")
+        menu.addItem(withTitle: HostLanguage.text("显示连接窗口", "Show Connection Window"), action: #selector(showWindow), keyEquivalent: "")
+        menu.addItem(withTitle: HostLanguage.text("Safari 扩展设置", "Safari Extension Settings"), action: #selector(openPreferences), keyEquivalent: "")
         menu.addItem(.separator())
-        menu.addItem(withTitle: "退出连接", action: #selector(quit), keyEquivalent: "q")
+        menu.addItem(withTitle: HostLanguage.text("退出连接", "Quit Bridge"), action: #selector(quit), keyEquivalent: "q")
         menu.items.forEach { $0.target = self }
         statusItem?.menu = menu
     }
@@ -77,10 +94,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             localServer = try LocalBridgeServer(root: root!, token: connectionSettings!["token"] as! String)
             localServer?.start()
         } catch { setupError = error.localizedDescription }
+        NotificationCenter.default.addObserver(self, selector: #selector(refreshLanguage), name: HostLanguage.changed, object: nil)
         updateMenuBarItem()
         timer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { [weak self] _ in self?.poll() }
         poll()
     }
+    @objc private func refreshLanguage() { updateMenuBarItem() }
     @objc func showWindow() { NSApp.activate(ignoringOtherApps: true); NSApp.windows.first?.makeKeyAndOrderFront(nil) }
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool { showWindow(); return true }
     @objc func openPreferences() { SFSafariApplication.showPreferencesForExtension(withIdentifier: extensionBundleIdentifier) { _ in } }

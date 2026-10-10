@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.1 — companion language and test packaging
+
+- Add a persistent Simplified Chinese / English picker to the companion window, with localized buttons, connection/save messages and the optional menu-bar menu. Default to the system language; keep sidebar language independent.
+- Add `scripts/build.sh --ad-hoc` for a universal test package without a personal signing certificate; use a separate test app group.
+- Document Gatekeeper handling, Safari developer settings and restart limitations, dependencies, optional dictation and unverified fresh-Mac shared-container behavior.
+- Verify language switching, English layout and restart persistence in the personally signed installed app. Verify both architectures and extracted ad hoc signatures; fresh-Mac end-to-end installation remains unverified.
+
 ## 0.5.0 — search and Work
 
 - Fix send-time white flashes: crop sidebar pixels out of screenshots without hiding or repainting the live panel; reject changed capture geometry.
