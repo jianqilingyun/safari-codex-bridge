@@ -44,7 +44,7 @@ for BRIDGE_ARCH in $BRIDGE_ARCHS; do
   BRIDGE_PART="$BRIDGE_WORK/SafariChatHelper-$BRIDGE_ARCH"
   swiftc -parse-as-library -module-cache-path "$BRIDGE_WORK/SwiftCache" -target "$BRIDGE_ARCH-apple-macosx13.0" \
     -framework Cocoa -framework ApplicationServices "$BRIDGE_SOURCE/chat-runtime/ChatHelper.swift" \
-    "$BRIDGE_SOURCE/chat-runtime/Dictation.swift" -o "$BRIDGE_PART"
+    "$BRIDGE_SOURCE/chat-runtime/Dictation.swift" "$BRIDGE_SOURCE/chat-runtime/CommandQueue.swift" "$BRIDGE_SOURCE/chat-runtime/Workspaces.swift" -o "$BRIDGE_PART"
   BRIDGE_PARTS+=("$BRIDGE_PART")
 done
 lipo -create "${BRIDGE_PARTS[@]}" -output "$BRIDGE_HELPER/Contents/MacOS/SafariChatHelper"

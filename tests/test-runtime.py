@@ -6,7 +6,7 @@ spec=importlib.util.spec_from_file_location('worker',root/'chat-runtime/worker.p
 class Tests(unittest.TestCase):
  def test_same_turn_recovery_when_stream_completion_missing(self):
   events=[];oldemit=m.emit;m.emit=lambda job,event,**v:events.append(dict(event=event,**v))
-  e=m.Engine.__new__(m.Engine);e.sessions={'s':'thr_test'};e.active={};e.lock=threading.RLock();e.session_busy=set()
+  e=m.Engine.__new__(m.Engine);e.sessions={'s':'thr_test'};e.active={};e.lock=threading.RLock();e.search_modes={};e.work_mode=False;e.approvals={};e.work=types.SimpleNamespace(name="/tmp/fixture");e.session_busy=set()
   def rpc(method,params,**kw):
    if method=='turn/start':return {'turn':{'id':'turn_test'}}
    if method=='thread/read':return {'thread':{'turns':[{'id':'turn_test','status':'completed','items':[{'type':'agentMessage','text':'恢复的完成回答'}]}]}}

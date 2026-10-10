@@ -20,6 +20,10 @@ def fake_engine():
     engine = worker.Engine.__new__(worker.Engine)
     engine.lock = threading.RLock()
     engine.sessions = {'s': 'thr_fixture'}
+    engine.search_modes = {}
+    engine.work_mode = False
+    engine.approvals = {}
+    engine.work = type("Work", (), {"name": "/tmp/fixture"})()
     engine.session_busy = set()
     engine.active = {}
     return engine

@@ -31,6 +31,7 @@ try {
  assert.equal(parseFloat(layout.padding),layout.width);checks.push('right panel reserves page width and opens without navigation');
  await page.evaluate(()=>testShadow.getElementById('model-trigger').click());
  const selectors=await page.evaluate(()=>['model','effort'].map(id=>({width:testShadow.getElementById(id).getBoundingClientRect().width,appearance:getComputedStyle(testShadow.getElementById(id)).appearance,label:testShadow.getElementById(id).selectedOptions[0].textContent})));assert(selectors[0].width>=130&&selectors[1].width>=70);assert(selectors.every(s=>s.appearance==='none'&&s.label));checks.push('model and effort selectors retain readable width after dynamic options load');await page.evaluate(()=>testShadow.getElementById('model-trigger').click());
+ assert.equal(await page.evaluate(()=>testShadow.getElementById('web-search').checked),true);checks.push('web search enabled by default');
  assert.equal(await page.evaluate(()=>testShadow.getElementById('messages').textContent),'');checks.push('empty conversations have no title or preset question buttons');
  await page.evaluate(()=>testShadow.getElementById('pin').click());await page.waitForFunction(()=>testShadow.getElementById('pin').getAttribute('aria-pressed')==='true');assert(await page.evaluate(()=>sent.some(m=>m.type==='sidebar_preferences'&&m.values.pinned===true)));checks.push('pin icon persists and visibly reflects enabled state');
  const beforeVoice=await page.evaluate(()=>sent.filter(m=>m.type==='sidebar_ask').length);
@@ -102,12 +103,31 @@ try {
  await page.evaluate(()=>{state.preferences.dictation_shortcut_mode='single';testShadow.getElementById('question').dispatchEvent(new Event('input'));});
  checks.push('double-tap configurations keep official completion fallback instead of sending an unsupported finish toggle');
 
+ await page.evaluate(()=>{state.mode='work';state.workspace=null;});
+ await page.waitForFunction(()=>testShadow.getElementById('mode-note').textContent==='Work');
+ assert.equal(await page.evaluate(()=>testShadow.getElementById('submit').disabled),false);
+ assert(!(await page.evaluate(()=>testShadow.getElementById('status').textContent)).includes('Choose a Work folder first'));
+ checks.push('new Work chat can send without selecting a folder or showing an obsolete setup warning');
+ await page.evaluate(()=>{state.workspace='/tmp/public-work-fixture';state.busy=true;state.approval={id:'approval-fixture',kind:'command',command:'python3 create_report.py',cwd:state.workspace,reason:'Generate a local report'};});
+ await page.waitForFunction(()=>!testShadow.getElementById('approval-panel').hidden);
+ assert(await page.evaluate(()=>testShadow.getElementById('approval-panel').textContent.includes('python3 create_report.py')));checks.push('Work approval shows the command and selected folder');
+ for(const w of [460,340,280]){const grip=await page.evaluate(()=>{const r=testShadow.getElementById('resize').getBoundingClientRect();return{x:r.left+3,y:r.top+180};});await page.mouse.move(grip.x,grip.y);await page.mouse.down();await page.mouse.move(1440-w,grip.y,{steps:4});await page.mouse.up();assert.equal(await page.evaluate(()=>Math.round(document.querySelector('[data-safari-codex-sidebar]').getBoundingClientRect().width)),w);assert(await page.evaluate(()=>{const p=testShadow.getElementById('approval-panel'),r=p.getBoundingClientRect();return p.scrollWidth<=p.clientWidth+1&&r.width<innerWidth&&testShadow.querySelector('.panel').scrollWidth<=testShadow.querySelector('.panel').clientWidth+1;}));}
+ checks.push('Work approval stays inside narrow panels');
+ await page.evaluate(()=>testShadow.getElementById('approval-panel').querySelector('button').click());await page.waitForFunction(()=>sent.some(m=>m.type==='sidebar_approve'));
+ assert.equal(await page.evaluate(()=>sent.find(m=>m.type==='sidebar_approve').decision),'decline');checks.push('decline is explicit and bound to the displayed request ID');
+ await page.evaluate(()=>state.approvalPending=true);await page.waitForFunction(()=>[...testShadow.getElementById('approval-panel').querySelectorAll('button')].every(b=>b.disabled));checks.push('approval transport remains disabled until acknowledged');
+ await page.evaluate(()=>{state.busy=false;state.approvalPending=false;state.approval=null;state.workspace='/tmp/synthetic-work';state.history=[{role:'assistant',text:'Generated report.csv and report.html; total=70',activities:[{id:'c',type:'commandExecution',command:'python3 make_report.py',output:'Generated report.csv; total=70',exit_code:0}]}];});
+ await page.waitForFunction(()=>testShadow.querySelector('.work-activity'));
+ await page.evaluate(()=>{testShadow.querySelector('.work-activity').open=true;testShadow.getElementById('work-files').click();});
+ assert(await page.evaluate(()=>sent.some(m=>m.type==='sidebar_reveal_workspace')));assert(await page.evaluate(()=>testShadow.getElementById('workspace-path').textContent.includes('synthetic-work')));assert(await page.evaluate(()=>testShadow.querySelector('.work-activity').textContent.includes('Exit 0')));checks.push('Work location, expandable command output and Finder folder entry remain available after completion');
+ await page.screenshot({path:root+'/tests/work-completed-280.png'});
+ await page.evaluate(()=>{state.busy=false;state.mode='chat';state.approval=null;state.preferences.width=460;});await page.waitForFunction(()=>testShadow.getElementById('approval-panel').hidden);
  await page.evaluate(()=>{testShadow.getElementById('question').value='这张图中，最后一根柱子是多少？是第一根的几倍？';testShadow.getElementById('submit').click();});
  await page.waitForFunction(()=>testShadow.getElementById('messages').textContent.includes('4 倍'));
  assert(await page.evaluate(()=>sent.some(m=>m.type==='sidebar_ask'&&m.attach_page&&m.include_image)));checks.push('composer asks from current page with screenshot and displays the reply in-panel');
  const collected=await page.evaluate(()=>__safariCodexCollect({mode:'page'}));assert(collected.text.includes('三个季度'));assert(!collected.text.includes('最后一根柱子的数值是'));assert(!collected.text.includes('Codex 网页问答'));checks.push('collector excludes sidebar chat and private composer');
- const capture=await page.evaluate(async()=>{const f=listeners.find(f=>f({type:'sidebar_hide_capture'},{id:'fixture'}));const geometry=await f({type:'sidebar_hide_capture'},{id:'fixture'});const hidden=getComputedStyle(document.querySelector('[data-safari-codex-sidebar]')).visibility;await f({type:'sidebar_restore_capture'},{id:'fixture'});return{geometry,hidden,restored:getComputedStyle(document.querySelector('[data-safari-codex-sidebar]')).visibility};});
- assert.equal(capture.hidden,'hidden');assert.equal(capture.restored,'visible');assert.equal(capture.geometry.crop_width,1440-layout.width);checks.push('screenshot temporarily hides sidebar and returns exact crop width');
+ const capture=await page.evaluate(async()=>{const f=listeners.find(f=>f({type:'sidebar_capture_geometry'},{id:'fixture'}));const geometry=await f({type:'sidebar_capture_geometry'},{id:'fixture'});return{geometry,visibility:getComputedStyle(document.querySelector('[data-safari-codex-sidebar]')).visibility};});
+ assert.equal(capture.visibility,'visible');assert.equal(capture.geometry.crop_width,await page.evaluate(()=>document.querySelector('[data-safari-codex-sidebar]').getBoundingClientRect().left));checks.push('screenshot obtains exact crop boundary while keeping sidebar visible');
  await page.evaluate(()=>{state.history.push({role:'user',text:'第一根和最后一根合计是多少？'},{role:'assistant',text:'合计 **50**。'});});
  await page.waitForFunction(()=>testShadow.getElementById('messages').textContent.includes('合计 50'));
  await page.screenshot({path:root+'/tests/sidebar-preview.png'});checks.push('multiple turns remain visible and rich text renders safely');

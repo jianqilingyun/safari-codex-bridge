@@ -48,13 +48,21 @@ Copy `build/DerivedData/Build/Products/Release/Safari-Codex-Bridge.app` to Appli
 
 Keep the companion running for chat and optional MCP access. Its window can close without stopping it. The menu-bar icon is hidden by default and can be enabled from the connection window. Pinning automatically opens the sidebar only on websites Safari already permits.
 
-## 5. Optional official dictation
+## 5. Search and Work
+
+The **+** menu contains the Chat/Work selector and web-search toggle. Chat enables official search by default while keeping local file/code tools disabled. Work can start without folder setup. The native helper creates a separate folder for the chat on its first task; use **+ → Choose folder** only to work with existing local files. The **Files** link reveals the current folder in Finder, and the + menu shows its full path. The sidebar shows protected-operation approvals and expandable tool records.
+
+Work uses workspace-write/on-request: ordinary sandboxed file and code operations can execute in the working folder without a separate approval; protected/outside-sandbox operations request permission. Decline cancels that requested operation; Stop interrupts the turn and pending approvals. The official sandbox permits reads outside the folder where macOS allows, so the folder is not a complete read-isolation boundary. No new Accessibility permission is required for Work. Review context and the task before sending.
+
+Temporary chats cannot change mode, search or folder after their first turn; create a new temporary chat instead. Saved chats support these changes between turns.
+
+## 6. Optional official dictation
 
 In the official Codex desktop app, configure Settings → Voice → Dictation → Advanced → **Single tap shortcut**, for example `Ctrl+Option+D`. Enter exactly the same keybinding in the sidebar settings and select Single tap mode. Grant **Safari Chat Helper** Accessibility access in macOS Privacy & Security only if you want this feature.
 
 Click the microphone, speak, then click it again to dispatch the finishing shortcut. Codex transcribes into the focused Safari composer; edit the text before sending. This local toggle cannot observe official recording state. If you stop via a different shortcut or close/navigate the sidebar, use the official Codex controls to finish or cancel recording. Some Codex versions or input methods may change insertion behavior.
 
-## 6. Optional MCP in an existing Codex chat
+## 7. Optional MCP in an existing Codex chat
 
 This is separate from the webpage sidebar and is not required for sidebar chat. In the connection window choose **Save Codex local connection configuration**, saving the suggested file to `~/Documents/Safari-Codex-connection.json`. It contains a local pairing secret; never commit it.
 

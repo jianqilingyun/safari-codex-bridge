@@ -26,7 +26,8 @@ async function content(tab, message) {
 async function rasterize(dataUrl, maxDimension=2400, cropFraction=1) {
   if (!/^data:image\/(png|jpeg|webp|gif);base64,/.test(dataUrl)) throw new Error('Unsupported image encoding');
   const img = new Image(); img.src = dataUrl; await img.decode();
-  const sourceWidth=Math.max(1,Math.round(img.naturalWidth*Math.max(0.1,Math.min(1,cropFraction))));
+  if(!Number.isFinite(cropFraction)||cropFraction<=0||cropFraction>1)throw new Error('Invalid crop boundary');
+  const sourceWidth=Math.max(1,Math.floor(img.naturalWidth*cropFraction));
   const scale = Math.min(1,maxDimension / Math.max(sourceWidth,img.naturalHeight));
   const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(sourceWidth*scale));canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));
   const ctx=canvas.getContext('2d');
@@ -66,7 +67,7 @@ async function readImage(tab,id) {
 async function execute(command) {
   const a=command.args || {};
   switch(command.action) {
-    case 'status': return {version:'0.4.8',connected:true,captured_at:new Date().toISOString(),sidebar_tabs:[...sidebarTabs].map(([tab_id,s])=>({tab_id,window_id:s.windowId,opened:s.opened,busy:s.busy,message_count:s.history.length,error:s.error}))};
+    case 'status': return {version:'0.5.0',connected:true,captured_at:new Date().toISOString(),sidebar_tabs:[...sidebarTabs].map(([tab_id,s])=>({tab_id,window_id:s.windowId,opened:s.opened,busy:s.busy,message_count:s.history.length,error:s.error,mode:s.mode,workspace_pending:!!s.workspaceJob,workspace_selected:!!s.workspace}))};
     case 'list_tabs': return {captured_at:new Date().toISOString(),tabs:(await browser.tabs.query({})).filter(normalTab).map(t=>({tab_id:t.id,window_id:t.windowId,title:t.title,url:t.url,active:t.active}))};
     case 'read_page': {const t=await targetTab(a.tab_id);return {tab_id:t.id,...await content(t,{type:'collect',args:a})};}
     case 'capture_visible_page': {
@@ -129,17 +130,17 @@ function tabState(tab) {
   if(!sidebarTabs.has(tab.id)){
     const occupied=sidebarTabs.size>0;
     const restored=!occupied&&savedChats[lastSession];
-    sidebarTabs.set(tab.id,{windowId:tab.windowId,session:crypto.randomUUID(),temporary:false,thread_id:null,title:'新对话',history:[],model:preferences.model||'',effort:preferences.effort||'',...restored,opened:false,draft:'',context:null,models:[],authenticated:false,error:'',busy:false,catalogBusy:false,historyBusy:false});
+    sidebarTabs.set(tab.id,{windowId:tab.windowId,session:crypto.randomUUID(),temporary:false,thread_id:null,title:'新对话',mode:'chat',workspace:null,history:[],model:preferences.model||'',effort:preferences.effort||'',...restored,opened:false,draft:'',context:null,models:[],authenticated:false,error:'',busy:false,catalogBusy:false,historyBusy:false});
   }
   return sidebarTabs.get(tab.id);
 }
 async function persistChat(state) {
   if(state.temporary||!state.thread_id||!state.history.length)return;
-  savedChats[state.session]={session:state.session,thread_id:state.thread_id,title:state.title,history:state.history.map(({job,...m})=>m),model:state.model,effort:state.effort,updated_at:Date.now()};
+  savedChats[state.session]={session:state.session,thread_id:state.thread_id,title:state.title,mode:state.mode,workspace:state.workspace,history:state.history.map(({job,...m})=>m),model:state.model,effort:state.effort,updated_at:Date.now()};
   lastSession=state.session;await saveStore();
 }
 async function nativeJob(state, action, args={}) {
-  const id=crypto.randomUUID();const reply=await browser.runtime.sendNativeMessage(nativeApp,{type:'chat_request',request:{id,session:state.session,action,...args}});
+  const id=crypto.randomUUID();const reply=await browser.runtime.sendNativeMessage(nativeApp,{type:'chat_request',request:{id,session:state.session,mode:state.mode||'chat',temporary:!!state.temporary,action,...args}});
   if(!reply?.ok)throw new Error(reply?.error||'问答后台未就绪。请先打开 Safari Codex Bridge 应用。');
   return {id,started:Date.now(),revision:-1};
 }
@@ -161,13 +162,17 @@ async function cancelDictation(state) {
 async function pollSidebar(state) {
   if(state.polling)return;state.polling=true;
   try {
-    for(const key of ['catalogJob','historyJob','dictationJob','job']) {
+    for(const key of ['workspaceJob','approvalJob','catalogJob','historyJob','dictationJob','job']) {
       const job=state[key];if(!job)continue;
-      if(Date.now()-job.started>(key==='job'?260000:key==='dictationJob'?180000:60000))throw new Error('后台连接超时，请点击重连后重试。');
+      if(Date.now()-job.started>(key==='job'?(state.mode==='work'?1260000:260000):key==='workspaceJob'?600000:key==='dictationJob'?180000:60000))throw new Error('后台连接超时，请点击重连后重试。');
       const response=await browser.runtime.sendNativeMessage(nativeApp,{type:'chat_poll',id:job.id});
       if(!response?.ok)throw new Error(response?.error||'后台连接失败');
       const r=response.state;if(!r||r.revision===job.revision)continue;job.revision=r.revision;
-      if(key==='dictationJob') {
+      if(key==='workspaceJob') {
+        if(r.finished){delete state.workspaceJob;if(r.error)state.error=r.error;else if(r.workspace){state.workspace=r.workspace;await persistChat(state);}}
+      } else if(key==='approvalJob') {
+        if(r.finished){delete state.approvalJob;if(r.error)state.error=r.error;}
+      } else if(key==='dictationJob') {
         state.dictation={id:job.id,...r};
         if(r.finished)delete state.dictationJob;
       } else if(key==='catalogJob') {
@@ -176,27 +181,30 @@ async function pollSidebar(state) {
         if(r.finished){state.historyBusy=false;delete state.historyJob;if(r.error)state.error=r.error;else{state.history=r.history||[];state.title=r.title||state.title;await persistChat(state);}}
       } else {
         const assistant=state.history.find(m=>m.job===job.id);
+        if(r.workspace)state.workspace=r.workspace;
+        state.search=r.search;
+        state.approval=r.approval;state.activity=r.activity;
         if(r.thread_id&&!state.thread_id){state.thread_id=r.thread_id;await persistChat(state);}
         if(assistant&&typeof r.text==='string')assistant.text=r.text;
-        if(r.finished){state.busy=false;delete state.job;state.error=r.error||'';if(assistant&&!assistant.text)assistant.text=r.error?'回答未完成。':r.event==='stopped'?'已停止。':'模型未返回内容，请重试。';await persistChat(state);}
+        if(assistant&&Array.isArray(r.activities))assistant.activities=r.activities;
+        if(r.finished){state.busy=false;state.approval=null;delete state.job;state.error=r.error||'';if(assistant&&!assistant.text)assistant.text=r.error?'回答未完成。':r.event==='stopped'?'已停止。':'模型未返回内容，请重试。';await persistChat(state);}
       }
     }
-  } catch(e){await cancelDictation(state).catch(()=>{});state.error=e.message;state.busy=false;state.catalogBusy=false;state.historyBusy=false;delete state.job;delete state.catalogJob;delete state.historyJob;}
+  } catch(e){if(state.job)await nativeJob(state,'stop').catch(()=>{});await cancelDictation(state).catch(()=>{});state.error=e.message;state.busy=false;state.approval=null;state.catalogBusy=false;state.historyBusy=false;delete state.job;delete state.catalogJob;delete state.historyJob;delete state.workspaceJob;delete state.approvalJob;}
   finally{state.polling=false;}
 }
 async function sidebarScreenshot(tab) {
-  let geometry;
-  try{
-    geometry=await browser.tabs.sendMessage(tab.id,{type:'sidebar_hide_capture'});
-    // Let Safari paint the hidden panel before capturing the visible viewport.
-    await new Promise(r=>setTimeout(r,100));
+    // Crop away the sidebar pixels without hiding or repainting the live UI.
+    const geometry=await browser.tabs.sendMessage(tab.id,{type:'sidebar_capture_geometry'});
+    if(!geometry||!Number.isFinite(geometry.crop_width)||!Number.isFinite(geometry.viewport_width)||geometry.crop_width<=0||geometry.crop_width>geometry.viewport_width)throw new Error('无法确定网页截图区域，请刷新网页后重试。');
     const before=(await browser.tabs.query({active:true,windowId:tab.windowId}))[0];
     if(before?.id!==tab.id)throw new Error('请保持目标标签页可见，或取消截图。');
     const image=await browser.tabs.captureVisibleTab(tab.windowId,{format:'png'});
     const after=(await browser.tabs.query({active:true,windowId:tab.windowId}))[0];
     if(after?.id!==tab.id||after?.url!==tab.url)throw new Error('截图时网页发生变化，请重试。');
-    return await rasterize(image,2400,geometry?.crop_width/geometry?.viewport_width||1);
-  } finally{await browser.tabs.sendMessage(tab.id,{type:'sidebar_restore_capture'}).catch(()=>{});}
+    const finalGeometry=await browser.tabs.sendMessage(tab.id,{type:'sidebar_capture_geometry'});
+    if(finalGeometry?.crop_width!==geometry.crop_width||finalGeometry?.viewport_width!==geometry.viewport_width)throw new Error('截图时网页发生变化，请重试。');
+    return await rasterize(image,2400,geometry.crop_width/geometry.viewport_width);
 }
 
 async function sidebarMessage(message,sender) {
@@ -222,7 +230,25 @@ async function sidebarMessage(message,sender) {
       await pollSidebar(state);
       if(!state.catalogBusy&&Date.now()-(state.catalogAt||0)>300000)await loadCatalog(state);
       if(state.context&&state.context.url!==tab.url)state.context=null;
-      return {opened:state.opened,session:state.session,temporary:state.temporary,thread_id:state.thread_id,title:state.title,history:state.history,models:state.models,model:state.model,effort:state.effort,authenticated:state.authenticated,error:state.error,busy:state.busy,catalogBusy:state.catalogBusy,historyBusy:state.historyBusy,runtime:state.runtime,preferences,draft:state.draft,context:state.context,dictation:state.dictation};
+      return {opened:state.opened,session:state.session,temporary:state.temporary,thread_id:state.thread_id,title:state.title,mode:state.mode,workspace:state.workspace,workspaceBusy:!!state.workspaceJob,approval:state.approval,approvalPending:!!state.approvalJob,activity:state.activity,history:state.history,models:state.models,model:state.model,effort:state.effort,authenticated:state.authenticated,error:state.error,busy:state.busy,preparing:state.preparing,searchMode:state.searchMode,search:state.search,catalogBusy:state.catalogBusy,historyBusy:state.historyBusy,runtime:state.runtime,preferences,draft:state.draft,context:state.context,dictation:state.dictation};
+    case 'sidebar_mode':
+      if(!['chat','work'].includes(message.mode))throw new Error('无效的模式。');
+      if(state.busy||state.preparing||state.historyBusy||state.workspaceJob)throw new Error('请先完成当前操作。');
+      if(state.temporary&&state.thread_id)throw new Error('请在新的临时聊天中切换模式。');
+      if(state.mode!==message.mode){await nativeJob(state,'reset');state.mode=message.mode;state.activity=null;await persistChat(state);}
+      return {ok:true};
+    case 'sidebar_workspace':
+      if(state.mode!=='work'||state.busy||state.preparing||state.historyBusy||state.workspaceJob)throw new Error('请先完成当前操作。');
+      if(state.temporary&&state.thread_id)throw new Error('请在新的临时聊天中更改工作文件夹。');
+      state.workspaceJob=await nativeJob(state,'choose_workspace');return {ok:true};
+    case 'sidebar_reveal_workspace':
+      if(state.mode!=='work'||!state.workspace)throw new Error('请先选择 Work 文件夹。');
+      await nativeJob(state,'reveal_workspace');return {ok:true};
+    case 'sidebar_approve':
+      if(state.mode!=='work'||!state.busy||state.approvalJob||!state.approval||state.approval.id!==message.approval_id)throw new Error('审批已过期或不属于当前对话。');
+      if(!['accept','decline'].includes(message.decision))throw new Error('无效的审批决定。');
+      state.approvalJob=await nativeJob(state,'approve',{approval_id:message.approval_id,decision:message.decision,answers:message.answers});
+      return {ok:true};
     case 'sidebar_draft':
       if(typeof message.text==='string'&&message.text.length<=8000)state.draft=message.text;
       return {ok:true};
@@ -242,6 +268,7 @@ async function sidebarMessage(message,sender) {
       if(['zh-CN','en'].includes(message.values?.language))preferences.language=message.values.language;
       if([12,14,16,18,20].includes(message.values?.font_size))preferences.font_size=message.values.font_size;
       if(typeof message.values?.pinned==='boolean')preferences.pinned=message.values.pinned;
+      if(typeof message.values?.web_search==='boolean')preferences.web_search=message.values.web_search;
       if(typeof message.values?.dictation_shortcut==='string'&&message.values.dictation_shortcut.length<=64)preferences.dictation_shortcut=message.values.dictation_shortcut.trim();
       if(['single','double'].includes(message.values?.dictation_shortcut_mode))preferences.dictation_shortcut_mode=message.values.dictation_shortcut_mode;
       if(message.values?.model!==undefined)state.model=message.values.model;
@@ -249,10 +276,10 @@ async function sidebarMessage(message,sender) {
       await persistChat(state);await saveStore();if(message.values?.language!==undefined)await updateChromeLanguage();return {ok:true};
     case 'sidebar_history_list':return {chats:Object.values(savedChats).map(({history,...record})=>record).sort((a,b)=>b.updated_at-a.updated_at)};
     case 'sidebar_history_open': {
-      if(state.busy||state.preparing||state.historyBusy||state.dictationStarting)throw new Error('请先完成当前操作。');
+      if(state.busy||state.preparing||state.historyBusy||state.workspaceJob||state.dictationStarting)throw new Error('请先完成当前操作。');
       await cancelDictation(state);
       const record=savedChats[message.session];if(!record)throw new Error('未找到这段历史。');
-      await nativeJob(state,'reset');delete state.historyJob;state.historyBusy=false;Object.assign(state,record,{temporary:false,error:'',draft:'',context:null});await loadHistory(state);return {ok:true};
+      await nativeJob(state,'reset');delete state.historyJob;state.historyBusy=false;Object.assign(state,{mode:'chat',workspace:null,approval:null,activity:null,searchMode:null},record,{temporary:false,error:'',draft:'',context:null});await loadHistory(state);return {ok:true};
     }
     case 'sidebar_open_desktop':
       if(state.temporary||!state.thread_id)throw new Error('临时会话不加入 Codex 历史。');
@@ -292,13 +319,15 @@ async function sidebarMessage(message,sender) {
       if(state.dictationJob?.id===message.id||!message.id)await cancelDictation(state);
       return {ok:true};
     case 'sidebar_new':
-      if(state.busy||state.preparing||state.historyBusy||state.dictationStarting)throw new Error('请先完成当前操作。');
+      if(state.busy||state.preparing||state.historyBusy||state.workspaceJob||state.dictationStarting)throw new Error('请先完成当前操作。');
       await cancelDictation(state);
-      await nativeJob(state,'reset');delete state.historyJob;state.historyBusy=false;state.session=crypto.randomUUID();state.temporary=!!message.temporary;state.thread_id=null;state.title='新对话';state.history=[];state.error='';state.draft='';state.context=null;return {ok:true};
+      await nativeJob(state,'reset');delete state.historyJob;state.historyBusy=false;state.session=crypto.randomUUID();state.temporary=!!message.temporary;state.thread_id=null;state.title='新对话';state.mode='chat';state.workspace=null;state.activity=null;state.approval=null;state.searchMode=null;state.history=[];state.error='';state.draft='';state.context=null;return {ok:true};
     case 'sidebar_ask': {
       if(state.busy||state.preparing||state.historyBusy||state.dictationJob||state.dictationStarting)throw new Error('请先完成当前回答或听写。');
       if([...sidebarTabs.values()].some(s=>s!==state&&s.thread_id&&s.thread_id===state.thread_id&&s.busy))throw new Error('这段对话正在另一个标签页回答，请等待完成。');
       if(!state.authenticated)throw new Error('请先连接已登录的 Codex 账号。');
+      if(state.workspaceJob)throw new Error('请先完成当前操作。');
+      if(state.temporary&&state.thread_id&&state.searchMode!==(message.web_search!==false))throw new Error('请在新的临时聊天中更改搜索设置。');
       if(typeof message.question!=='string'||!message.question.trim()||message.question.length>8000)throw new Error('请输入 8000 字以内的问题。');
       if(!state.models.some(m=>m.model===message.model))throw new Error('所选模型已不可用，请刷新模型列表重新选择。不会自动替换模型。');
       const chosen=state.models.find(m=>m.model===message.model);
@@ -321,7 +350,8 @@ async function sidebarMessage(message,sender) {
         const latest=await targetTab(tab.id);if(latest.url!==tab.url)throw new Error('网页发生变化，请重试。');
         if(!state.history.length)state.title='Safari · '+message.question.slice(0,44);
         state.model=message.model;state.effort=message.effort;
-        state.job=await nativeJob(state,'chat',{question:message.question,model:message.model,effort:message.effort,pages,thread_id:state.thread_id,temporary:state.temporary,title:state.title});
+        state.searchMode=message.web_search!==false;state.search=null;state.activity=null;state.approval=null;
+        state.job=await nativeJob(state,'chat',{question:message.question,model:message.model,effort:message.effort,pages,web_search:message.web_search!==false,thread_id:state.thread_id,temporary:state.temporary,title:state.title});
         state.history.push({role:'user',text:message.question,sources:pages.map(p=>({title:p.title,url:p.url,kind:p.mode==='selection'?'selection':'page',excerpt:p.mode==='selection'?p.text:undefined}))},{role:'assistant',text:'',job:state.job.id});
         state.draft='';state.context=null;
         state.busy=true;return {ok:true};

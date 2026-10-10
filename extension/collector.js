@@ -1,6 +1,6 @@
 /* DOM data stays in Safari until the extension asks for it. */
 (() => {
-  const collectorVersion='0.4.8';
+  const collectorVersion='0.5.0';
   if (globalThis.__safariCodexCollector === collectorVersion) return;
   if (globalThis.__safariCodexListener) browser.runtime.onMessage.removeListener(globalThis.__safariCodexListener);
   globalThis.__safariCodexCollector = collectorVersion;

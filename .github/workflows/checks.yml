@@ -26,3 +26,7 @@ jobs:
       - run: |
           swiftc -parse-as-library -framework Cocoa -framework ApplicationServices chat-runtime/Dictation.swift tests/test-dictation-shortcut.swift -o /tmp/bridge-shortcut-tests
           /tmp/bridge-shortcut-tests
+          swiftc -parse-as-library chat-runtime/CommandQueue.swift tests/test-command-queue.swift -o /tmp/bridge-queue-tests
+          /tmp/bridge-queue-tests
+          swiftc -parse-as-library chat-runtime/Workspaces.swift tests/test-workspaces.swift -o /tmp/bridge-workspace-tests
+          /tmp/bridge-workspace-tests

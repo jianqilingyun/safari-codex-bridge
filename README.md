@@ -1,6 +1,6 @@
 # Safari Codex Bridge
 
-A Safari sidebar for asking questions about the page you are reading — text, selected passages, images and charts — through your own Codex account.
+A Safari sidebar for asking questions about the page you are reading — text, selected passages, images and charts — through your own Codex account. Switch to Work for scoped file and code tasks.
 
 [简体中文](README.zh-CN.md) · [Build & install](docs/INSTALL.md) · [Privacy](PRIVACY.md) · [Security](SECURITY.md)
 
@@ -10,6 +10,8 @@ A Safari sidebar for asking questions about the page you are reading — text, s
 
 - Chat alongside the current webpage, with streaming answers and follow-up questions.
 - Attach selected text, page text, a visible screenshot, or up to three additional authorized tabs. Review or remove references before sending.
+- Search the web through the official Codex search tool, with source links. Search is enabled by default and can be turned off.
+- Switch between webpage Chat and **Work**. Start directly in an automatically created per-chat folder, process files, run code and generate artifacts. Choose an existing folder only when your task needs it. Protected operations appear as explicit approvals in the sidebar; inspect the operation log and use **Files** to reveal the working folder.
 - Discover models and reasoning efforts from the official Codex app-server; unavailable models produce an error rather than silently switching.
 - Save chats by default in Codex history; reopen them or continue in the Codex desktop app. Temporary chats are optional.
 - Pin the sidebar on authorized websites, resize down to 280 px, choose Chinese or English UI, light/dark/system appearance, and 12–20 px text.
@@ -45,12 +47,14 @@ Safari page → isolated sidebar / content collector
             ← streamed responses ← your Codex account
 ```
 
-The helper discovers the installed official runtime and checks its protocol before use. It does not redistribute an OpenAI executable, copy login tokens, or automate the ChatGPT website. The sidebar runtime disables inherited MCP servers and agent-tool feature flags and refuses approval/client-tool requests. Webpage material is labeled as untrusted reference content.
+The helper discovers the installed official runtime and checks its protocol before use. It does not redistribute an OpenAI executable, copy login tokens, or automate the ChatGPT website. Chat and Work use separate runtime profiles. Chat keeps local file/code tools disabled. Work enables core file/code tools with workspace-write sandboxing and on-request approvals, overrides inherited writable roots on every turn, and accepts only a current, explicitly approved operation. Both profiles disable inherited MCP servers and optional agents/apps/plugins. Read access follows the official sandbox and macOS permissions; the working folder is not a filesystem read-isolation guarantee. Webpage material is labeled as untrusted reference content.
 
 The integration uses the documented [Codex app-server](https://learn.chatgpt.com/docs/app-server) interfaces. Runtime discovery, dynamic model lists and compatibility checks reduce update coupling; future protocol or desktop shortcut changes may still require a bridge update.
 
 ## Scope and limitations
 
+- Work exposes the official core local tools, not every ChatGPT web/desktop feature. Connectors, computer/browser control, agent delegation, image generation and specialized ChatGPT modes are not exposed in this release.
+- Once a temporary chat has started, its mode, search setting and folder are fixed; start a new temporary chat to change them. Saved chats can be reconfigured between turns.
 - Safari has no Chrome-style extension side-panel surface in this implementation. The sidebar uses a closed Shadow DOM inside the webpage; unusual site layouts can still interfere.
 - It reads loaded content. It cannot retrieve inaccessible subscription articles, hidden cross-origin frames, or an entire long page from a viewport screenshot.
 - A screenshot can include private information currently visible on screen. Check context before sending. See [Privacy](PRIVACY.md).
