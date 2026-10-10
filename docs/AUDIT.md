@@ -25,6 +25,8 @@ Checked on 2026-10-10. This is a publication-focused code review and regression 
 - Real ephemeral inference with **gpt-6-luna** on a synthetic chart returned 40 and 4×, then 50 on a follow-up. No active inherited MCP tools were reported. No private webpage was used.
 - Git publication includes a staged-file privacy/credential audit. Pairing files, account state, personal signing data, local chat results and real browser screenshots are excluded. Public preview images are synthetic fixtures with mocked replies.
 
+GitHub’s first macOS build exposed an Xcode 27 project-format dependency; the project was adjusted to the conventional Xcode 14 format for older supported build hosts.
+
 ## Remaining limits
 
 This source release has not been installed into a fresh third-party Mac, notarized, or tested on an actual Intel Safari session. The public build removes the private fallback runtime and uses each user’s installed official Codex runtime, which was checked separately. The installed personal 0.4.7 application was not replaced during this audit.
