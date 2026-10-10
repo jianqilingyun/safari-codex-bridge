@@ -22,7 +22,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - run: ./scripts/build.sh --unsigned
+      - run: ./scripts/build.sh --ad-hoc
       - run: |
           swiftc -parse-as-library -framework Cocoa -framework ApplicationServices chat-runtime/Dictation.swift tests/test-dictation-shortcut.swift -o /tmp/bridge-shortcut-tests
           /tmp/bridge-shortcut-tests

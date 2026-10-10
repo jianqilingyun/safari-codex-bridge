@@ -4,9 +4,11 @@
 
 [English](README.md) · [构建与安装](docs/INSTALL.md) · [隐私说明](PRIVACY.md)
 
-**社区独立项目，并非 OpenAI、Apple 或 Google 官方扩展。首次公开发布提供源码；需要在自己的 Mac 上构建并签名，暂不提供经过公证的一键安装包。**
+**社区独立项目，并非 OpenAI、Apple 或 Google 官方扩展。提供源码及可选的临时签名测试包：[下载发布版本](https://github.com/jianqilingyun/safari-codex-bridge/releases/latest)。测试包未公证，需要 Safari 开发者设置，尚未在全新 Mac 上完成端到端安装验证；请先阅读[安装注意事项](docs/AD-HOC-INSTALL.zh-CN.md)。长期本机使用仍推荐自行开发签名。**
 
 ## 已有功能
+
+- 主程序窗口支持简体中文 / English 切换，立即生效并保存选择，菜单栏菜单同步切换；网页侧栏语言仍可单独设置。
 
 - 官方联网搜索默认开启，回答可引用外部来源；也可以关闭搜索。
 - 新增 **Work**：无需提前设置文件夹，新任务自动使用独立目录来处理文件、运行代码、生成成果；需要处理已有文件时，再从原生窗口选择位置；受保护操作在侧栏审批，操作记录可以展开查看，Files 入口在 Finder 中显示工作文件夹。

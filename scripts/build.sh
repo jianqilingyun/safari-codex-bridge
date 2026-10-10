@@ -8,8 +8,17 @@ BRIDGE_TEAM_ID="${BRIDGE_TEAM_ID:-}"
 BRIDGE_SIGN_IDENTITY="${BRIDGE_SIGN_IDENTITY:-}"
 BRIDGE_ARCHS="${BRIDGE_ARCHS:-arm64 x86_64}"
 BRIDGE_UNSIGNED=false
-if [[ "${1:-}" == --unsigned ]]; then BRIDGE_UNSIGNED=true; shift; fi
-if [[ $# -ne 0 ]]; then printf 'Usage: scripts/build.sh [--unsigned]\n' >&2; exit 2; fi
+BRIDGE_AD_HOC=false
+case "${1:-}" in
+  --unsigned) BRIDGE_UNSIGNED=true; shift ;;
+  --ad-hoc) BRIDGE_AD_HOC=true; shift ;;
+esac
+if [[ $# -ne 0 ]]; then printf 'Usage: scripts/build.sh [--unsigned | --ad-hoc]\n' >&2; exit 2; fi
+if [[ "$BRIDGE_AD_HOC" == true ]]; then
+  # Never reuse the maintainer's certificate or team in a public test package.
+  BRIDGE_TEAM_ID=ADHOCTEST0
+  BRIDGE_SIGN_IDENTITY=-
+fi
 if [[ ! "$BRIDGE_BUNDLE_PREFIX" =~ ^[A-Za-z0-9]+([.-][A-Za-z0-9]+)+$ ]]; then
   printf 'Invalid BRIDGE_BUNDLE_PREFIX\n' >&2; exit 2
 fi
@@ -58,7 +67,11 @@ if [[ "$BRIDGE_UNSIGNED" == false ]]; then
   done
   codesign --verify --deep --strict "$BRIDGE_APP"
   ditto -c -k --sequesterRsrc --keepParent "$BRIDGE_APP" "$BRIDGE_WORK/Safari-Codex-Bridge-Mac.zip"
-  printf 'Signed build (not notarized): %s\n' "$BRIDGE_APP"
+  if [[ "$BRIDGE_AD_HOC" == true ]]; then
+    printf 'Ad hoc test build (not notarized; Safari developer settings required): %s\n' "$BRIDGE_APP"
+  else
+    printf 'Signed build (not notarized): %s\n' "$BRIDGE_APP"
+  fi
 else
   printf 'Unsigned build check only: %s\n' "$BRIDGE_APP"
 fi
