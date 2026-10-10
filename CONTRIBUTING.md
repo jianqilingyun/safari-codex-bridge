@@ -19,12 +19,16 @@ On macOS, check shortcut parsing without pressing keys or recording:
 ```sh
 swiftc -parse-as-library -framework Cocoa -framework ApplicationServices   chat-runtime/Dictation.swift tests/test-dictation-shortcut.swift -o /tmp/bridge-shortcut-tests
 /tmp/bridge-shortcut-tests
+swiftc -parse-as-library chat-runtime/CommandQueue.swift tests/test-command-queue.swift -o /tmp/bridge-queue-tests
+/tmp/bridge-queue-tests
+swiftc -parse-as-library chat-runtime/Workspaces.swift tests/test-workspaces.swift -o /tmp/bridge-workspace-tests
+/tmp/bridge-workspace-tests
 ```
 
-Live checks are **opt-in**: `tests/test-chat-live.py` sends a synthetic page/image through your signed-in account and consumes model usage. Run the UI suite first to generate `tests/fixture-viewport.png`. `tests/test-persistence-live.py` creates a saved test thread; manage it afterward in Codex. `tests/test_live.py` reads the currently visible Safari webpage and needs the exported pairing file. Do not run them against private material or in public CI. Set `SAFARI_CODEX_CONNECTION_FILE` when the pairing file is outside Documents.
+Live checks are **opt-in**: `tests/test-chat-live.py` sends a synthetic page/image through your signed-in account and consumes model usage. Run the UI suite first to generate `tests/fixture-viewport.png`. `tests/test-persistence-live.py` creates a saved test thread; manage it afterward in Codex. `tests/test-search-live.py` exercises official search on public documentation; `tests/test-work-live.py` creates a synthetic folder and approves only a prewritten report-generation command. They consume account usage and are excluded from CI. `tests/test_live.py` reads the currently visible Safari webpage and needs the exported pairing file. Do not run them against private material or in public CI. Set `SAFARI_CODEX_CONNECTION_FILE` when the pairing file is outside Documents.
 
 ## Architecture
 
 `extension/` owns collection and isolated UI; `native/` owns the sandboxed host and native Safari handler; `chat-runtime/` owns official app-server transport and optional dictation shortcut dispatch; `codex-plugin/` contains the optional read-only MCP server. `scripts/build.sh` packages them without installing or starting the application.
 
-Use documented app-server messages, discover model/effort values dynamically, keep tools disabled, treat webpage data as references, and test compatibility with the runtime you used. Keep generated artifacts ignored.
+Use documented app-server messages, discover model/effort values dynamically, keep Chat tools disabled and Work permissions explicitly scoped, treat webpage data as references, and test compatibility with the runtime you used. Keep generated artifacts ignored.

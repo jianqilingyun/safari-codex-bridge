@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Safari Codex Bridge",
-  "version": "0.4.8",
+  "version": "0.5.0",
   "description": "在 Safari 右侧连续询问当前网页，支持正文、图片、图表与 Codex 订阅模型。",
   "permissions": [
     "nativeMessaging",

@@ -4,7 +4,7 @@ import importlib.util,json,threading
 root=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('selection_worker',root/'chat-runtime/worker.py')
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
-e=m.Engine.__new__(m.Engine);e.sessions={'s':'thr_fixture'};e.active={};e.lock=threading.RLock();e.session_busy=set();requests=[]
+e=m.Engine.__new__(m.Engine);e.sessions={'s':'thr_fixture'};e.active={};e.lock=threading.RLock();e.search_modes={};e.work_mode=False;e.approvals={};e.work=type("Work",(),{"name":"/tmp/fixture"})();e.session_busy=set();requests=[]
 m.emit=lambda *a,**k:None
 def rpc(method,params,**kw):
  if method=='turn/start':

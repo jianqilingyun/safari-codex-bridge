@@ -16,6 +16,10 @@ class ChatHelper: NSObject, NSApplicationDelegate {
     private var input: FileHandle?
     private var buffer = Data()
     private var states: [String: [String: Any]] = [:]
+    private var workspaces: [String: String] = [:]
+    private var temporaryWorkspaces = Set<String>()
+    private var workspacePanel: NSOpenPanel?
+    private var workspacePanelSession: String?
     private var parentPID: pid_t = 0
     private let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown"
     private var lastActivity = Date()
@@ -24,11 +28,15 @@ class ChatHelper: NSObject, NSApplicationDelegate {
         NSApp.setActivationPolicy(.prohibited)
         guard let group = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: Bundle.main.object(forInfoDictionaryKey: "BridgeAppGroup") as? String ?? "") else { NSApp.terminate(nil); return }
         root = group.appendingPathComponent("context-bridge")
+        workspaces = (load(root.appendingPathComponent("workspaces.json")) as? [String: String]) ?? [:]
         for name in ["chat-commands", "chat-events"] {
             try? FileManager.default.createDirectory(at: root.appendingPathComponent(name), withIntermediateDirectories: true, attributes: [.posixPermissions: 0o700])
         }
         if let host = load(root.appendingPathComponent("host.json")), let pid = host["pid"] as? Int { parentPID = pid_t(pid) }
-        timer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { [weak self] _ in self?.poll() }
+        let heartbeat = Timer(timeInterval: 0.25, repeats: true) { [weak self] _ in self?.poll() }
+        timer = heartbeat
+        RunLoop.main.add(heartbeat, forMode: .common)
+        RunLoop.main.add(heartbeat, forMode: .modalPanel)
     }
     private func startWorker() throws {
         if process?.isRunning == true { return }
@@ -76,6 +84,16 @@ class ChatHelper: NSObject, NSApplicationDelegate {
         state["event"] = kind
         for key in ["cancelled", "handed_off"] { if let v = value[key] { state[key] = v } }
         if let thread = value["thread_id"] as? String { state["thread_id"] = thread }
+        if let workspace = value["workspace"] as? String { state["workspace"] = workspace }
+        if let search = value["search"] as? [String: Any] { state["search"] = search }
+        if let activity = value["activity"] as? [String: Any] {
+            state["activity"] = activity
+            var activities = state["activities"] as? [[String: Any]] ?? []
+            if let itemID = activity["id"] as? String, let index = activities.firstIndex(where: { $0["id"] as? String == itemID }) { activities[index] = activity }
+            else { activities.append(activity) }
+            state["activities"] = Array(activities.suffix(50))
+        }
+        if value.keys.contains("approval") { state["approval"] = value["approval"] }
         if kind == "delta" || kind == "message" {
             var messages = state["messages"] as? [String: String] ?? [:]
             var order = state["order"] as? [String] ?? []
@@ -85,9 +103,10 @@ class ChatHelper: NSObject, NSApplicationDelegate {
             state["messages"] = messages; state["order"] = order
             state["text"] = order.compactMap { messages[$0] }.joined(separator: "\n\n")
         }
-        if ["done", "stopped", "error", "catalog", "history", "ack"].contains(kind) {
+        if ["done", "stopped", "error", "catalog", "history", "ack", "workspace"].contains(kind) {
             state["finished"] = true
-            for key in ["text", "error", "authenticated", "auth_type", "plan", "models", "runtime", "history", "title"] {
+            if ["done", "stopped", "error"].contains(kind) { state["approval"] = NSNull() }
+            for key in ["text", "error", "authenticated", "auth_type", "plan", "models", "runtime", "history", "title", "workspace"] {
                 if let v = value[key], !(v is NSNull) { state[key] = v }
             }
         }
@@ -97,15 +116,24 @@ class ChatHelper: NSObject, NSApplicationDelegate {
     private func poll() {
         let now = Date().timeIntervalSince1970
         if let host = load(root.appendingPathComponent("host.json")), let version = host["version"] as? String, version != appVersion { NSApp.terminate(nil); return }
-        save(["updated_at": now, "version": appVersion], root.appendingPathComponent("chat-host.json"))
+        save(["updated_at": now, "version": appVersion, "folder_chooser_open": workspacePanel != nil, "workspace_count": workspaces.count], root.appendingPathComponent("chat-host.json"))
         if parentPID > 0 && kill(parentPID, 0) != 0 { NSApp.terminate(nil); return }
         let directory = root.appendingPathComponent("chat-commands")
-        for file in (try? FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)) ?? [] where file.pathExtension == "json" {
-            guard let request = load(file), let id = request["id"] as? String, UUID(uuidString: id) != nil,
+        let files = (try? FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)) ?? []
+        // File enumeration order is undefined. The native extension assigns
+        // expires_at when enqueueing, so reset must precede the next request.
+        let requests = files.filter { $0.pathExtension == "json" }.compactMap { file in
+            load(file).map { (file, $0) }
+        }.sorted(by: bridgeCommandPrecedes)
+        for (file, value) in requests {
+            var request = value
+            guard let id = request["id"] as? String, UUID(uuidString: id) != nil,
                   file.lastPathComponent == "\(id).json", let expires = request["expires_at"] as? Double else { continue }
             try? FileManager.default.removeItem(at: file)
             if request["action"] as? String == "reset", let session = request["session"] as? String {
+                if workspacePanelSession == session { workspacePanel?.cancel(nil) }
                 dictation.cancel(session: session)
+                if temporaryWorkspaces.remove(session) != nil { workspaces.removeValue(forKey: session) }
                 for (oldID, value) in states where value["session"] as? String == session {
                     states.removeValue(forKey: oldID)
                     try? FileManager.default.removeItem(at: root.appendingPathComponent("chat-events/\(oldID).json"))
@@ -113,6 +141,57 @@ class ChatHelper: NSObject, NSApplicationDelegate {
             }
             states[id] = ["id": id, "session": request["session"] ?? "", "revision": 0, "finished": false, "updated_at": now]
             if expires < now { event(["id": id, "event": "error", "error": "网页请求已过期，请重试。"]); continue }
+            if request["action"] as? String == "choose_workspace", let session = request["session"] as? String {
+                guard workspacePanel == nil else {
+                    event(["id": id, "event": "error", "error": "请先完成已打开的文件夹选择。"]); continue
+                }
+                NSApp.setActivationPolicy(.accessory); NSApp.activate(ignoringOtherApps: true)
+                let panel = NSOpenPanel(); panel.canChooseDirectories = true; panel.canChooseFiles = false; panel.allowsMultipleSelection = false
+                panel.prompt = "Select"; panel.message = "Select the folder Codex can work in."
+                workspacePanel = panel; workspacePanelSession = session
+                let temporary = request["temporary"] as? Bool == true
+                // Keep polling and delivering worker events while the chooser
+                // is open; runModal would suspend the default-mode timer.
+                panel.begin { [weak self] response in
+                    guard let self = self else { return }
+                    if response == .OK, let url = panel.url, self.states[id] != nil {
+                        let path = url.resolvingSymlinksInPath().standardized.path
+                        if temporary { self.temporaryWorkspaces.insert(session) }
+                        self.workspaces[session] = path
+                        self.save(self.workspaces.filter { !self.temporaryWorkspaces.contains($0.key) }, self.root.appendingPathComponent("workspaces.json"))
+                        self.event(["id": id, "event": "workspace", "workspace": path])
+                    } else { self.event(["id": id, "event": "ack"]) }
+                    self.workspacePanel = nil; self.workspacePanelSession = nil
+                    NSApp.setActivationPolicy(.prohibited)
+                    NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.Safari").first?.activate(options: .activateIgnoringOtherApps)
+                }
+                continue
+            }
+            if request["action"] as? String == "reveal_workspace", let session = request["session"] as? String, let path = workspaces[session] {
+                NSWorkspace.shared.activateFileViewerSelecting([URL(fileURLWithPath: path)])
+                event(["id": id, "event": "ack"]); continue
+            }
+            if request["action"] as? String == "chat", request["mode"] as? String == "work" {
+                guard let session = request["session"] as? String else { continue }
+                if workspaces[session] == nil {
+                    do {
+                        let base = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Documents/Codex/Safari网页问答/Work")
+                        let temporary = request["temporary"] as? Bool == true
+                        let url = try bridgeManagedWorkspace(base: base, session: session, temporary: temporary)
+                        workspaces[session] = url.path
+                        if temporary { temporaryWorkspaces.insert(session) }
+                        save(workspaces.filter { !temporaryWorkspaces.contains($0.key) }, root.appendingPathComponent("workspaces.json"))
+                    } catch {
+                        event(["id": id, "event": "error", "error": "无法创建工作文件夹，请从侧栏选择位置后重试。"]); continue
+                    }
+                }
+                guard let path = workspaces[session], FileManager.default.fileExists(atPath: path) else {
+                    event(["id": id, "event": "error", "error": "工作文件夹已不可用，请重新选择。"]); continue
+                }
+                // Never trust a workspace path supplied by the webpage client.
+                request["workspace"] = path
+                event(["id": id, "event": "workspace_ready", "workspace": path])
+            }
             if dictation.handle(request) { lastActivity = Date(); continue }
             do {
                 try startWorker()

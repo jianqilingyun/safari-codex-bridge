@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.0 — search and Work
+
+- Fix send-time white flashes: crop sidebar pixels out of screenshots without hiding or repainting the live panel; reject changed capture geometry.
+- Enable official live web search by default, show search progress and cite external sources; provide an off switch and handle ephemeral configuration limits explicitly.
+- Add a separate Work profile, native folder picker, workspace-write core file/code tools, protected-operation approvals, cancellation, bounded tool records and a Finder folder entry.
+- Start new Work tasks in an automatically created independent folder; selecting a folder is optional and intended for existing files. Keep the native chooser responsive while the helper processes events.
+- Bind approvals to active runtime requests; reject stale/wrong-session/persistent permission replies; override inherited writable roots for every Work turn.
+- Keep Chat local tools isolated and disable inherited optional MCP/apps/plugins/agents in both profiles.
+- Add pixel-crop, Work transport and approval regressions, plus opt-in real search and file-generation checks.
+
 ## 0.4.8 — first public source release
 
 - Restore selected-text references separately from user questions in saved history.

@@ -1,3 +1,34 @@
+# Source audit — 0.5.0
+
+Checked on 2026-10-10. This is a development review and regression pass, not a formal security certification.
+
+## New repairs and capabilities
+
+| Finding or capability | Evidence |
+| --- | --- |
+| Send-time white flash | Captures no longer hide the sidebar; rasterization crops at the exact current panel boundary. Real canvas tests exclude all synthetic chat pixels, including boundaries below 10% of viewport width, and reject geometry changes. |
+| Search was explicitly disabled and instructions restricted answers to attachments | Per-thread official live web search is enabled by default; search lifecycle is surfaced. A real gpt-6-luna test emitted search events and returned a primary-source link. A new ephemeral search-off thread emitted no search events. |
+| Local file/code tasks unavailable | Separate Work profile, independent automatic folders, optional native folder selection and explicit per-turn workspaceWrite policy. A real prewritten synthetic task requested approval, generated report.csv/report.html after acceptance and returned the expected total 70. An earlier decline produced no files. |
+| Work required advance folder configuration | Mode changes no longer open the picker. The first task allocates a native session folder; invalid session IDs and symlink paths are rejected. Request-order and native chooser regressions retain event processing. |
+| Approval replies could become unsafe or stale | Active thread/request binding, no persistent accept or frontend-supplied permission expansion, duplicate/wrong-session rejection, queued approval handling, stop cancellation and response acknowledgement. Unit and transport regressions. |
+| Ephemeral threads cannot resume configuration | UI and worker require a new temporary chat for changes to mode, search or workspace. Saved-thread search reconfiguration is covered by a protocol fixture. |
+| Work history and output visibility | Bounded command/file records restore from official history; native Files entry reveals the selected folder without executing artifacts. |
+
+## Current validation
+
+- **270 automated checks**: 203 JavaScript checks, 38 Python checks and 29 Swift checks covering shortcuts, request order and managed folders. Browser checks use synthetic pages and mocked transport; pixel-crop checks use real image/canvas operations.
+- Work approvals were checked after actual sidebar dragging to 280/340/460 px; completed operation records were visually inspected. Existing 280–520 px and theme/language/text-size coverage remains.
+- Signed universal host, extension and helper compiled for arm64/x86_64; deep/strict signature and ZIP integrity verification passed. Signing data and built applications are excluded from Git.
+- Official runtime checks used codex-cli 0.162.0-alpha.17.2 and gpt-6-luna. Live search and scoped file generation consume the local tester account and are opt-in, excluded from CI.
+- The personal installation was upgraded to 0.5.0 (24) with a verified 0.4.7 rollback archive. Real Safari on a public Wikipedia page completed official search, automatic-folder file generation and optional existing-folder selection. A protected synthetic command was approved in the sidebar at 280 px and generated CSV/HTML with the expected total 70. Operation output and exit status were visible in the sidebar. A second operation was declined and its output marker was absent; Files revealed the correct folder in Finder. These checks supplement the fixture suite; third-party installation remains unverified.
+- No OpenAI executable, account state, pairing file, signing identity, real webpage screenshot or live test output is part of the source release.
+
+## Limits
+
+Work uses official workspace-write/on-request behavior: normal sandboxed tasks may run without a prompt, and readable files outside the selected folder can be accessible where macOS permits. This is not a strict read-isolation product. Inherited MCP, apps/connectors/plugins and optional agent/computer/browser/image-generation tools remain disabled. The bridge does not claim all ChatGPT web features. Third-party Mac installation, notarization and live Intel Safari remain unverified.
+
+---
+
 # Source audit — 0.4.8
 
 Checked on 2026-10-10. This is a publication-focused code review and regression pass, not a formal security certification.

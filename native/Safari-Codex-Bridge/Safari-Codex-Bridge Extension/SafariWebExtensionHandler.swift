@@ -17,7 +17,7 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
             case "chat_request":
                 guard let request = message["request"] as? [String: Any],
                       let id = request["id"] as? String, UUID(uuidString: id) != nil,
-                      let action = request["action"] as? String, ["catalog", "chat", "history", "stop", "reset", "dictate_start", "dictate_finish", "dictate_stop", "dictate_cancel"].contains(action),
+                      let action = request["action"] as? String, ["catalog", "chat", "history", "stop", "reset", "approve", "choose_workspace", "reveal_workspace", "dictate_start", "dictate_finish", "dictate_stop", "dictate_cancel"].contains(action),
                       let session = request["session"] as? String, UUID(uuidString: session) != nil else {
                     throw NSError(domain: "SafariCodexBridge", code: 6)
                 }

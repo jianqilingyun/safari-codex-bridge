@@ -216,6 +216,15 @@ class LocalBridgeServer {
         guard let action = request["action"] as? String else { return ["error": "Missing action"] }
         if action == "host_status" {
             var result: [String: Any] = ["version": Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown", "running": true]
+            if let data = try? Data(contentsOf: root.appendingPathComponent("chat-host.json")), let value = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] {
+                result["chat_helper"] = ["version": value["version"] ?? "unknown", "heartbeat_age_seconds": Date().timeIntervalSince1970 - (value["updated_at"] as? Double ?? 0), "folder_chooser_open": value["folder_chooser_open"] ?? false, "workspace_count": value["workspace_count"] ?? 0]
+            }
+            let eventFiles = (try? FileManager.default.contentsOfDirectory(at: root.appendingPathComponent("chat-events"), includingPropertiesForKeys: nil)) ?? []
+            let eventStates = eventFiles.prefix(200).compactMap { url -> [String: Any]? in
+                guard let data = try? Data(contentsOf: url) else { return nil }
+                return (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
+            }
+            result["chat_events"] = ["pending": eventStates.filter { $0["finished"] as? Bool != true }.count, "completed_folder_selections": eventStates.filter { $0["event"] as? String == "workspace" && $0["finished"] as? Bool == true }.count]
             if let data = try? Data(contentsOf: root.appendingPathComponent("desktop-open-result.json")), let value = try? JSONSerialization.jsonObject(with: data) { result["last_desktop_open"] = value }
             return ["result": result]
         }

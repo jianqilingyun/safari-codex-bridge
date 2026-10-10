@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "safari-codex-bridge",
-  "version": "0.4.8",
+  "version": "0.5.0",
   "description": "Read Safari webpages, selections, images and visible-page screenshots in existing Codex chats through a local companion.",
   "license": "MIT",
   "extensions": {
